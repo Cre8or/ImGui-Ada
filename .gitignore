@@ -1,5 +1,23 @@
-# Object file
-*.o
-
-# Ada Library Information
+*.stderr
+*.stdout
+*.lexch
+*.bexch
 *.ali
+*.cswi
+*.a
+*.o
+*.d
+*.db
+*.db-shm
+*.db-wal
+*.cgpr
+*.exe
+*.log
+*.rpt
+
+obj/*
+lib/*
+
+# Test project
+test_project/obj/*
+test_project/lib/*
