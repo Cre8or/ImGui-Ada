@@ -1,20 +1,25 @@
-pragma License( Modified_GPL );
+pragma License (Modified_GPL);
 
 
 
 
 
-private with Dear_ImGui.API;
+with Dear_ImGui.API;
 with Dear_ImGui.Inputs;
 
 
 
-pragma Elaborate( Dear_ImGui.API );
-pragma Elaborate( Dear_ImGui.Inputs );
+pragma Elaborate (Dear_ImGui.API);
+pragma Elaborate (Dear_ImGui.Inputs);
 
 
 
 
+
+generic
+
+	with package P_API    is new Dear_ImGui.API;
+	with package P_Inputs is new Dear_ImGui.Inputs (P_API, <>);
 
 package Dear_ImGui.Context is
 
@@ -27,13 +32,13 @@ package Dear_ImGui.Context is
 		------------------------------------------------------------------------------------------------------------------------
 		-- Returns an access to the context's IO record.
 		------------------------------------------------------------------------------------------------------------------------
-		function Get_IO(Context : in out T_ImGuiContext) return Dear_ImGui.Inputs.T_ImGuiIO
+		function Get_IO (Context : in out T_ImGuiContext) return P_Inputs.T_ImGuiIO
 		with Inline;
 
 		------------------------------------------------------------------------------------------------------------------------
 		-- Returns true if the given context is initialised, otherwise false.
 		------------------------------------------------------------------------------------------------------------------------
-		function Is_Initialised(Context : in T_ImGuiContext) return Boolean
+		function Is_Initialised (Context : in T_ImGuiContext) return Boolean
 		with Inline;
 
 
@@ -50,7 +55,7 @@ package Dear_ImGui.Context is
 	-- Creates the ImGui context and stores it in the given variable.
 	-- Analogous to ImGui::CreateContext.
 	------------------------------------------------------------------------------------------------------------------------
-	procedure Initialise(Context : out T_ImGuiContext)
+	procedure Initialise (Context : out T_ImGuiContext)
 	with Inline;
 
 	------------------------------------------------------------------------------------------------------------------------
@@ -65,7 +70,7 @@ package Dear_ImGui.Context is
 	-- Destroys the given ImGui context.
 	-- Analogous to ImGui::DestroyContext.
 	------------------------------------------------------------------------------------------------------------------------
-	procedure Destroy(Context : in out T_ImGuiContext)
+	procedure Destroy (Context : in out T_ImGuiContext)
 	with Inline;
 
 
@@ -76,8 +81,19 @@ private
 
 	-- Types
 	type T_ImGuiContext is tagged limited record
-		m_Internal : access Dear_ImGui.API.ImGuiContext;
+		m_Internal : access P_API.ImGuiContext;
 	end record;
+
+
+
+	-- Specifications
+	------------------------------------------------------------------------------------------------------------------------
+	function API_CreateContext (Shared_Font_Atlas : access P_API.ImFontAtlas := null) return access P_API.ImGuiContext
+	with Import, Convention => C, External_Name => "igCreateContext";
+
+	------------------------------------------------------------------------------------------------------------------------
+	procedure API_DestroyContext (Context : access P_API.ImGuiContext)
+	with Import, Convention => C, External_Name => "igDestroyContext";
 
 
 

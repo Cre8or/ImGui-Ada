@@ -1,8 +1,10 @@
-pragma License( Modified_GPL );
+pragma License (Modified_GPL);
 
 
 
 
+
+generic
 
 package Dear_ImGui.Types is
 
@@ -19,6 +21,31 @@ package Dear_ImGui.Types is
 	subtype T_Config_Flag     is T_Unsigned;
 	subtype T_Window_Flag     is T_Unsigned;
 	subtype T_Slider_Flag     is T_Unsigned;
+
+	type T_Colour_RGB is record
+		R, G, B : aliased T_Float;
+	end record
+	with Convention => C_Pass_By_Copy;
+
+	type T_Colour_RGBA is record
+		R, G, B, A : aliased T_Float;
+	end record
+	with Convention => C_Pass_By_Copy;
+
+	type T_Vector2 is record
+		X, Y : aliased T_Float;
+	end record
+	with Convention => C_Pass_By_Copy;
+
+	type T_Vector3 is record
+		X, Y, Z : aliased T_Float;
+	end record
+	with Convention => C_Pass_By_Copy;
+
+	type T_Vector4 is record
+		X, Y, Z, W : aliased T_Float;
+	end record
+	with Convention => C_Pass_By_Copy;
 
 	type T_ImGuiKey is (
 		E_ImGuiKey_None,
@@ -320,22 +347,12 @@ package Dear_ImGui.Types is
 		E_ImGuiButton_Middle => 2
 	);
 
-	type T_Colour3 is record
-		R, G, B : aliased Float;
-	end record
-	with Convention => C_Pass_By_Copy;
-
-	type T_Colour4 is record
-		R, G, B, A : aliased Float;
-	end record
-	with Convention => C_Pass_By_Copy;
-
 
 
 	-- Constants
 	C_Backend_Flag_None                 : constant T_Backend_Flag := 0;
 	C_Backend_Flag_HasGamepad           : constant T_Backend_Flag := 2 ** 0; -- Backend Platform supports gamepad and currently has one connected.
-	C_Backend_Flag_HasMouseCursors      : constant T_Backend_Flag := 2 ** 1; -- Backend Platform supports honoring GetMouseCursor() value to change the OS cursor shape.
+	C_Backend_Flag_HasMouseCursors      : constant T_Backend_Flag := 2 ** 1; -- Backend Platform supports honoring GetMouseCursor () value to change the OS cursor shape.
 	C_Backend_Flag_HasSetMousePos       : constant T_Backend_Flag := 2 ** 2; -- Backend Platform supports io.WantSetMousePos requests to reposition the OS mouse position (only used if ImGuiConfigFlags_NavEnableSetMousePos is set).
 	C_Backend_Flag_RendererHasVtxOffset : constant T_Backend_Flag := 2 ** 3; -- Backend Renderer supports ImDrawCmd::VtxOffset. This enables output of large meshes (64K+ vertices) while still using 16-bit indices.
 
@@ -366,17 +383,17 @@ package Dear_ImGui.Types is
     C_ColourEdit_Flag_InputRGB         : constant T_ColourEdit_Flag := 2 ** 27;  -- [Input]      -- ColorEdit, ColorPicker: input and output data in RGB format.
     C_ColourEdit_Flag_InputHSV         : constant T_ColourEdit_Flag := 2 ** 28;  -- [Input]      -- ColorEdit, ColorPicker: input and output data in HSV format.
 
-    -- Defaults Options. You can set application defaults using SetColorEditOptions(). The intent is that you probably don't want to
-    -- override them in most of your calls. Let the user choose via the option menu and/or call SetColorEditOptions() once during startup.
-    C_ColourEdit_Flag_DefaultOptions   : constant T_ColourEdit_Flag := C_ColourEdit_Flag_Uint8 or C_ColourEdit_Flag_DisplayRGB or C_ColourEdit_Flag_InputRGB or C_ColourEdit_Flag_PickerHueBar;
+    -- Defaults Options. You can set application defaults using SetColorEditOptions (). The intent is that you probably don't want to
+    -- override them in most of your calls. Let the user choose via the option menu and/or call SetColorEditOptions () once during startup.
+    C_ColourEdit_Flag_DefaultOptions  : constant T_ColourEdit_Flag := C_ColourEdit_Flag_Uint8 or C_ColourEdit_Flag_DisplayRGB or C_ColourEdit_Flag_InputRGB or C_ColourEdit_Flag_PickerHueBar;
 
 	C_Config_Flag_None                 : constant T_Config_Flag := 0;
-	C_Config_Flag_NavEnableKeyboard    : constant T_Config_Flag := 2 ** 0; -- Master keyboard navigation enable flag. NewFrame() will automatically fill io.NavInputs[] based on io.AddKeyEvent() calls
+	C_Config_Flag_NavEnableKeyboard    : constant T_Config_Flag := 2 ** 0; -- Master keyboard navigation enable flag. NewFrame () will automatically fill io.NavInputs[] based on io.AddKeyEvent () calls
 	C_Config_Flag_NavEnableGamepad     : constant T_Config_Flag := 2 ** 1; -- Master gamepad navigation enable flag. This is mostly to instruct your imgui backend to fill io.NavInputs[]. Backend also needs to set C_Backend_Flag_HasGamepad.
 	C_Config_Flag_NavEnableSetMousePos : constant T_Config_Flag := 2 ** 2; -- Instruct navigation to move the mouse cursor. May be useful on TV/console systems where moving a virtual mouse is awkward. Will update io.MousePos and set io.WantSetMousePos=true. If enabled you MUST honor io.WantSetMousePos requests in your backend, otherwise ImGui will react as if the mouse is jumping around back and forth.
 	C_Config_Flag_NavNoCaptureKeyboard : constant T_Config_Flag := 2 ** 3; -- Instruct navigation to not set the io.WantCaptureKeyboard flag when io.NavActive is set.
-	C_Config_Flag_NoMouse              : constant T_Config_Flag := 2 ** 4; -- Instruct imgui to clear mouse position/buttons in NewFrame(). This allows ignoring the mouse information set by the backend.
-	C_Config_Flag_NoMouseCursorChange  : constant T_Config_Flag := 2 ** 5; -- Instruct backend to not alter mouse cursor shape and visibility. Use if the backend cursor changes are interfering with yours and you don't want to use SetMouseCursor() to change mouse cursor. You may want to honor requests from imgui by reading GetMouseCursor() yourself instead.
+	C_Config_Flag_NoMouse              : constant T_Config_Flag := 2 ** 4; -- Instruct imgui to clear mouse position/buttons in NewFrame (). This allows ignoring the mouse information set by the backend.
+	C_Config_Flag_NoMouseCursorChange  : constant T_Config_Flag := 2 ** 5; -- Instruct backend to not alter mouse cursor shape and visibility. Use if the backend cursor changes are interfering with yours and you don't want to use SetMouseCursor () to change mouse cursor. You may want to honor requests from imgui by reading GetMouseCursor () yourself instead.
 
 	-- User storage (to allow your backend/engine to communicate to code that may be shared between multiple projects. Those flags are not used by core Dear ImGui)
 	C_Config_Flag_IsSRGB               : constant T_Config_Flag := 2 ** 20; -- Application is SRGB-aware.
@@ -390,11 +407,11 @@ package Dear_ImGui.Types is
 	C_Window_Flag_NoScrollWithMouse         : constant T_Window_Flag := 2 ** 4;   -- Disable user vertically scrolling with mouse wheel. On child window; mouse wheel will be forwarded to the parent unless NoScrollbar is also set.
 	C_Window_Flag_NoCollapse                : constant T_Window_Flag := 2 ** 5;   -- Disable user collapsing window by double-clicking on it. Also referred to as Window Menu Button (e.g. within a docking node).
 	C_Window_Flag_AlwaysAutoResize          : constant T_Window_Flag := 2 ** 6;   -- Resize every window to its content every frame
-	C_Window_Flag_NoBackground              : constant T_Window_Flag := 2 ** 7;   -- Disable drawing background color (WindowBg; etc.) and outside border. Similar as using SetNextWindowBgAlpha(0.0f).
+	C_Window_Flag_NoBackground              : constant T_Window_Flag := 2 ** 7;   -- Disable drawing background color (WindowBg; etc.) and outside border. Similar as using SetNextWindowBgAlpha (0.0f).
 	C_Window_Flag_NoSavedSettings           : constant T_Window_Flag := 2 ** 8;   -- Never load/save settings in .ini file
 	C_Window_Flag_NoMouseInputs             : constant T_Window_Flag := 2 ** 9;   -- Disable catching mouse; hovering test with pass through.
 	C_Window_Flag_MenuBar                   : constant T_Window_Flag := 2 ** 10;  -- Has a menu-bar
-	C_Window_Flag_HorizontalScrollbar       : constant T_Window_Flag := 2 ** 11;  -- Allow horizontal scrollbar to appear (off by default). You may use SetNextWindowContentSize(ImVec2(width;0.0f)); prior to calling Begin() to specify width. Read code in imgui_demo in the "Horizontal Scrolling" section.
+	C_Window_Flag_HorizontalScrollbar       : constant T_Window_Flag := 2 ** 11;  -- Allow horizontal scrollbar to appear (off by default). You may use SetNextWindowContentSize (ImVec2 (width;0.0f)); prior to calling Begin () to specify width. Read code in imgui_demo in the "Horizontal Scrolling" section.
 	C_Window_Flag_NoFocusOnAppearing        : constant T_Window_Flag := 2 ** 12;  -- Disable taking focus when transitioning from hidden to visible state
 	C_Window_Flag_NoBringToFrontOnFocus     : constant T_Window_Flag := 2 ** 13;  -- Disable bringing window to front when taking focus (e.g. clicking on it or programmatically giving it focus)
 	C_Window_Flag_AlwaysVerticalScrollbar   : constant T_Window_Flag := 2 ** 14;  -- Always show vertical scrollbar (even if ContentSize.y < Size.y)

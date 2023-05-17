@@ -1,18 +1,22 @@
-pragma License( Modified_GPL );
+pragma License (Modified_GPL);
 
 
 
 
 
-limited with Dear_ImGui.API;
+with Dear_ImGui.API;
 
 
 
-pragma Elaborate_All( Dear_ImGui.API );
+pragma Elaborate_All (Dear_ImGui.API);
 
 
 
 
+
+generic
+
+	with package P_API is new Dear_ImGui.API;
 
 package Dear_ImGui.Backend_OpenGL3 is
 
@@ -26,7 +30,7 @@ package Dear_ImGui.Backend_OpenGL3 is
 	-- Specifications
 	procedure Init;
 
-	procedure Init(GLSL_Version : in String);
+	procedure Init (GLSL_Version : in String);
 
 	procedure Shutdown
 	with Import   => True,
@@ -38,7 +42,7 @@ package Dear_ImGui.Backend_OpenGL3 is
 	Convention    => CPP,
 	External_Name => "_Z26ImGui_ImplOpenGL3_NewFramev";
 
-	procedure Render_Draw_Data (draw_data : access Dear_ImGui.API.ImDrawData)
+	procedure Render_Draw_Data (draw_data : access P_API.ImDrawData)
 	with Import   => True,
 	Convention    => CPP,
 	External_Name => "_Z32ImGui_ImplOpenGL3_RenderDrawDataP10ImDrawData";
