@@ -4,7 +4,7 @@ pragma License (Modified_GPL);
 
 
 
-package body Dear_ImGui.Context is
+package body Dear_ImGui.Contexts is
 
 
 
@@ -76,4 +76,4 @@ package body Dear_ImGui.Context is
 
 
 
-end Dear_ImGui.Context;
+end Dear_ImGui.Contexts;

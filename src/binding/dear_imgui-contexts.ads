@@ -21,7 +21,7 @@ generic
 	with package P_API    is new Dear_ImGui.API;
 	with package P_Inputs is new Dear_ImGui.Inputs (P_API, <>);
 
-package Dear_ImGui.Context is
+package Dear_ImGui.Contexts is
 
 
 
@@ -102,4 +102,4 @@ private
 
 
 
-end Dear_ImGui.Context;
+end Dear_ImGui.Contexts;

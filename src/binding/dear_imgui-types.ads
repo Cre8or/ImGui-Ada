@@ -21,14 +21,18 @@ package Dear_ImGui.Types is
 	subtype T_Config_Flag     is T_Unsigned;
 	subtype T_Window_Flag     is T_Unsigned;
 	subtype T_Slider_Flag     is T_Unsigned;
+	subtype T_Tab_Bar_Flag    is T_Unsigned;
+	subtype T_Tab_Item_Flag   is T_Unsigned;
+
+	subtype T_Float_Norm is T_Float range 0.0 .. 1.0;
 
 	type T_Colour_RGB is record
-		R, G, B : aliased T_Float;
+		R, G, B : aliased T_Float_Norm;
 	end record
 	with Convention => C_Pass_By_Copy;
 
 	type T_Colour_RGBA is record
-		R, G, B, A : aliased T_Float;
+		R, G, B, A : aliased T_Float_Norm;
 	end record
 	with Convention => C_Pass_By_Copy;
 
@@ -46,6 +50,21 @@ package Dear_ImGui.Types is
 		X, Y, Z, W : aliased T_Float;
 	end record
 	with Convention => C_Pass_By_Copy;
+
+	type T_Condition is (
+		--E_None,
+		E_Always,
+		E_Once,
+		E_First_Use_Ever,
+		E_Appearing
+	);
+	for T_Condition use (
+		--E_None           => 0,      -- No condition (always set the variable), same as _Always
+		E_Always         => 2 ** 0, -- No condition (always set the variable), same as _None
+		E_Once           => 2 ** 1, -- Set the variable once per runtime session (only the first call will succeed)
+		E_First_Use_Ever => 2 ** 2, -- Set the variable if the object/window has no persistently saved data (no entry in .ini file)
+		E_Appearing      => 2 ** 3  -- Set the variable if the object/window is appearing after being hidden/inactive (or the first time)
+	);
 
 	type T_ImGuiKey is (
 		E_ImGuiKey_None,
@@ -429,6 +448,28 @@ package Dear_ImGui.Types is
 	C_Slider_Flag_Logarithmic     : constant T_Slider_Flag := 2 ** 5;       -- Make the widget logarithmic (linear otherwise). Consider using C_Slider_Flag_NoRoundToFormat with this if using a format-string with small amount of digits.
 	C_Slider_Flag_NoRoundToFormat : constant T_Slider_Flag := 2 ** 6;       -- Disable rounding underlying value to match precision of the display format string (e.g. %.3f values are rounded to those 3 digits)
 	C_Slider_Flag_NoInput         : constant T_Slider_Flag := 2 ** 7;       -- Disable CTRL+Click or Enter key allowing to input text directly into the widget
+
+	C_Tab_Bar_Flag_None                         : constant T_Tab_Bar_Flag := 0;
+	C_Tab_Bar_Flag_Reorderable                  : constant T_Tab_Bar_Flag := 2 ** 0;   -- Allow manually dragging tabs to re-order them + New tabs are appended at the end of list
+	C_Tab_Bar_Flag_AutoSelectNewTabs            : constant T_Tab_Bar_Flag := 2 ** 1;   -- Automatically select new tabs when they appear
+	C_Tab_Bar_Flag_TabListPopupButton           : constant T_Tab_Bar_Flag := 2 ** 2;   -- Disable buttons to open the tab list popup
+	C_Tab_Bar_Flag_NoCloseWithMiddleMouseButton : constant T_Tab_Bar_Flag := 2 ** 3;   -- Disable behavior of closing tabs (that are submitted with p_open != NULL) with middle mouse button. You can still repro this behavior on user's side with if (IsItemHovered() && IsMouseClicked(2)) *p_open = false.
+	C_Tab_Bar_Flag_NoTabListScrollingButtons    : constant T_Tab_Bar_Flag := 2 ** 4;   -- Disable scrolling buttons (apply when fitting policy is C_Tab_Bar_Flag_FittingPolicyScroll)
+	C_Tab_Bar_Flag_NoTooltip                    : constant T_Tab_Bar_Flag := 2 ** 5;   -- Disable tooltips when hovering a tab
+	C_Tab_Bar_Flag_FittingPolicyResizeDown      : constant T_Tab_Bar_Flag := 2 ** 6;   -- Resize tabs when they don't fit
+	C_Tab_Bar_Flag_FittingPolicyScroll          : constant T_Tab_Bar_Flag := 2 ** 7;   -- Add scroll buttons when tabs don't fit
+	C_Tab_Bar_Flag_FittingPolicyMask            : constant T_Tab_Bar_Flag := C_Tab_Bar_Flag_FittingPolicyResizeDown or C_Tab_Bar_Flag_FittingPolicyScroll;
+	C_Tab_Bar_Flag_FittingPolicyDefault         : constant T_Tab_Bar_Flag := C_Tab_Bar_Flag_FittingPolicyResizeDown;
+
+	C_Tab_Item_Flag_None                         : constant T_Tab_Item_Flag := 0;
+	C_Tab_Item_Flag_UnsavedDocument              : constant T_Tab_Item_Flag := 2 ** 0;   -- Display a dot next to the title + tab is selected when clicking the X + closure is not assumed (will wait for user to stop submitting the tab). Otherwise closure is assumed when pressing the X, so if you keep submitting the tab may reappear at end of tab bar.
+	C_Tab_Item_Flag_SetSelected                  : constant T_Tab_Item_Flag := 2 ** 1;   -- Trigger flag to programmatically make the tab selected when calling BeginTabItem()
+	C_Tab_Item_Flag_NoCloseWithMiddleMouseButton : constant T_Tab_Item_Flag := 2 ** 2;   -- Disable behavior of closing tabs (that are submitted with p_open !: constant T_Tab_Item_Flag := NULL) with middle mouse button. You can still repro this behavior on user's side with if (IsItemHovered() && IsMouseClicked(2)) *p_open : constant T_Tab_Item_Flag := false.
+	C_Tab_Item_Flag_NoPushId                     : constant T_Tab_Item_Flag := 2 ** 3;   -- Don't call PushID(tab->ID)/PopID() on BeginTabItem()/EndTabItem()
+	C_Tab_Item_Flag_NoTooltip                    : constant T_Tab_Item_Flag := 2 ** 4;   -- Disable tooltip for the given tab
+	C_Tab_Item_Flag_NoReorder                    : constant T_Tab_Item_Flag := 2 ** 5;   -- Disable reordering this tab or having another tab cross over this tab
+	C_Tab_Item_Flag_Leading                      : constant T_Tab_Item_Flag := 2 ** 6;   -- Enforce the tab position to the left of the tab bar (after the tab list popup button)
+	C_Tab_Item_Flag_Trailing                     : constant T_Tab_Item_Flag := 2 ** 7;   -- Enforce the tab position to the right of the tab bar (before the scrolling buttons)
 
 
 
