@@ -1,4 +1,4 @@
-with "..\Dear_ImGui.gpr";
+with "../imgui.gpr";
 
 project Dear_ImGui_Test is
 
