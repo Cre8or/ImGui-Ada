@@ -1,7 +1,6 @@
 pragma License (Restricted);
 
-with Ada.Text_IO;
-with Interfaces.C.Strings;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Glfw.Input;
 with Glfw.Windows.Context;
@@ -14,49 +13,33 @@ with Generic_ImGui;
 
 procedure ImGui_Example is
 
-   -- Use clauses
-   use Ada;
+   package ImGui is new Generic_ImGui (Float);
 
-   -- Types
-   type T_Float is new Float;
+   use type ImGui.IG.T_Unsigned;
 
-   -- Packages
-   package P_ImGui is new Generic_ImGui (T_Float);
+   MENU_WIDTH : constant := 300.0;
+   MENU_HEIGHT : constant := 400.0;
+   ITEM_WIDTH : constant := 120.0;
+   PIZZA_WINDOW_FLAGS : constant := (
+      ImGui.Types.C_Window_Flag_NoSavedSettings or
+      ImGui.Types.C_Window_Flag_MenuBar);
 
-   -- Use clauses
-   use P_ImGui;
-
-   use type IG.T_Unsigned;
-
-   -- Variables
    Window : aliased Glfw.Windows.Window;
+   Window_Width : Glfw.Size := 640;
+   Window_Height : Glfw.Size := 480;
 
-   Continue : aliased Boolean := true;
-
-   Toggle_Pineapple : Boolean := false;
+   Pizza_Window_Is_Open : aliased Boolean := True;
+   Toggle_Pineapple : Boolean := False;
    Size_Int : Natural := 0; -- Valid options in range 1 .. 3;
-
-   Colour3   : Types.T_Colour_RGB  := (others => 0.0);
-   Colour4   : Types.T_Colour_RGBA := (others => 0.0);
-   Ratio     : T_Float := 0.1;
-   Eats_Meat : Boolean := true;
-
-   -- ImGui stuff
-   Current_Context : Contexts.T_ImGuiContext;
-   IO              : Inputs.T_ImGuiIO;
-
-   Window_Width  : Interfaces.C.Int := 640;
-   Window_Height : Interfaces.C.Int := 480;
-
-   -- Constants
-   C_Menu_Width  : constant T_Float := 300.0;
-   C_Menu_Height : constant T_Float := 400.0;
-
-   C_Item_Width : constant T_Float := 120.0;
-
+   Colour3 : ImGui.Types.T_Colour_RGB  := (others => 0.0);
+   Colour4 : ImGui.Types.T_Colour_RGBA := (others => 0.0);
+   Ratio : Float := 0.1;
+   Eats_Meat : Boolean := True;
+   Current_Context : ImGui.Contexts.T_ImGuiContext;
+   Theme_Is_Light : Boolean := False;
+   Toggle_Light_Theme : Boolean := False;
 begin
 
-   -- [Glfw] Initialisation
    Glfw.Init;
    Glfw.Windows.Hints.Set_Profile (Glfw.Windows.Context.Core_Profile);
    Glfw.Windows.Hints.Set_Minimum_OpenGL_Version (4, 2);
@@ -65,195 +48,199 @@ begin
    Glfw.Windows.Context.Make_Current (Window'Access);
    Glfw.Windows.Context.Set_Swap_Interval (1);
 
-   -- [ImGui] Initialisation
-   Contexts.Initialise (Current_Context);
-   IO := Current_Context.Get_IO;
+   ImGui.Contexts.Initialise (Current_Context);
 
-   -- Setup Dear ImGui style
-   --API.igStyleColorsLight;
+   ImGui.Backend_Glfw.Init_For_OpenGL (Window, True);
+   ImGui.Backend_OpenGL3.Init;
 
-   -- Setup Platform/Renderer backends
-   Backend_Glfw.Init_For_OpenGL (Window, True);
-   Backend_OpenGL3.Init;
-
-   while Continue and not Window.Should_Close loop
+   while
+      not Window.Should_Close and then Pizza_Window_Is_Open
+   loop
 
       Glfw.Input.Wait_For_Events;
 
-      -- Begin a new ImGui frame
-      Backend_OpenGL3.Begin_Frame;
-      Backend_Glfw.Begin_Frame;
-      Drawing.Begin_Frame;
+      ImGui.Backend_OpenGL3.Begin_Frame;
+      ImGui.Backend_Glfw.Begin_Frame;
+      ImGui.Drawing.Begin_Frame;
 
-      -- Initialise our window's position and size
-      Windows.Set_Next_Window_Position (
+      --  Initialise our window's position and size
+      ImGui.Windows.Set_Next_Window_Position (
          X         => 0.0,
          Y         => 0.0,
-         Condition => Types.E_Once
-      );
+         Condition => ImGui.Types.E_Once);
 
-      Windows.Set_Next_Window_Size (
-         C_Menu_Width,
-         C_Menu_Height,
-         Types.E_Once
-      );
+      ImGui.Windows.Set_Next_Window_Size (
+         Width     => MENU_WIDTH,
+         Height    => MENU_HEIGHT,
+         Condition => ImGui.Types.E_Once);
 
-      -- Draw our window
-      if Windows.Begin_Window (
-         "Pizza time!",
-         Types.C_Window_Flag_NoSavedSettings or Types.C_Window_Flag_MenuBar,
-         Continue -- Closing the window should terminate
-      ) then
+      if ImGui.Windows.Begin_Window (
+         "Pizza time!", PIZZA_WINDOW_FLAGS, Pizza_Window_Is_Open)
+      then
 
-         -- Check if the window closing-widget was pressed
-         if not Continue then
-            Text_IO.Put_Line ("TERMINATING: Window closing widget pressed");
+         if not Pizza_Window_Is_Open then
+            Put_Line ("ImGui Window closing widget pressed");
          end if;
 
-         --------------------------------
-         -- Create a menu
-         if Widgets.Begin_Menu_Bar then
+         -- Handle theme selection
+         if Theme_Is_Light then
+            -- We toggled off light theme
+            if not Toggle_Light_Theme then
+               ImGui.API.igStyleColorsDark;
+               Theme_Is_Light := False;
+            end if;
+         else
+            -- We toggled on light theme
+            if Toggle_Light_Theme then
+               ImGui.API.igStyleColorsLight;
+               Theme_Is_Light := True;
+            end if;
+         end if;
 
-            if Widgets.Begin_Menu ("File") then
+         if ImGui.Widgets.Begin_Menu_Bar then
 
-               if Widgets.Begin_Menu ("More...") then
-                  if Widgets.Menu_Item ("Do nothing") then
+            if ImGui.Widgets.Begin_Menu ("File") then
+
+               if ImGui.Widgets.Begin_Menu ("More...") then
+                  if ImGui.Widgets.Menu_Item ("Do nothing") then
                      null;
                   end if;
 
-                  Widgets.End_Menu;
+                  ImGui.Widgets.End_Menu;
                end if;
 
-               if Widgets.Menu_Item ("Print ""Test""") then
-                  Text_IO.Put_Line("Test");
+               if ImGui.Widgets.Menu_Item ("Print ""Test""") then
+                  Put_Line ("Test");
                end if;
 
-               Widgets.Menu_Item_Toggle ("Pineapple?", Toggle_Pineapple);
+               ImGui.Widgets.Menu_Item_Toggle ("Pineapple?", Toggle_Pineapple);
 
-               if Widgets.Menu_Item ("Unavailable", false, false) then
-                  Text_IO.Put_Line("How did you get here?!");
+               if ImGui.Widgets.Menu_Item ("Unavailable", False, False) then
+                  Put_Line ("How did you get here?!");
                end if;
 
-               Widgets.Text ("This isn't an item");
+               ImGui.Widgets.Menu_Item_Toggle (
+                  "Light Theme", Toggle_Light_Theme);
 
-               Widgets.Separator;
-               if Widgets.Menu_Item ("Exit") then
-                  Text_IO.Put_Line ("TERMINATING: ""Exit"" menu item pressed");
-                  Continue := false;
+               ImGui.Widgets.Text ("This isn't an item");
+
+               ImGui.Widgets.Separator;
+               if ImGui.Widgets.Menu_Item ("Exit") then
+                  Put_Line ("TERMINATING: ""Exit"" menu item pressed");
+                  Pizza_Window_Is_Open := False;
                end if;
 
-               Widgets.End_Menu;
+               ImGui.Widgets.End_Menu;
             end if;
 
-            if Widgets.Begin_Menu ("About") then
-               Widgets.Text ("Widgets are cool!");
+            if ImGui.Widgets.Begin_Menu ("About") then
+               ImGui.Widgets.Text ("Widgets are cool!");
 
-               Widgets.End_Menu;
+               ImGui.Widgets.End_Menu;
             end if;
 
-            Widgets.End_Menu_Bar;
+            ImGui.Widgets.End_Menu_Bar;
          end if;
 
-         -- Pressing the button should also terminate
-         if Widgets.Button ("I don't like pizza.") then
-            Text_IO.Put_Line ("TERMINATING: Button pressed");
-            Continue := false;
+         if ImGui.Widgets.Button ("I don't like pizza.") then
+            Put_Line ("TERMINATING: Button pressed");
+            Pizza_Window_Is_Open := False;
          end if;
 
-         Widgets.Push_Item_Width (-C_Item_Width);
+         ImGui.Widgets.Push_Item_Width (-ITEM_WIDTH);
 
-         --------------------------------
-         Widgets.Separator;
+         ImGui.Widgets.Separator;
 
-         Widgets.Text ("Select a size:");
-         Widgets.Radio_Button ("Small",  Size_Int, 1);
-         Widgets.Radio_Button ("Medium", Size_Int, 2);
-         Widgets.Radio_Button ("Large",  Size_Int, 3);
+         ImGui.Widgets.Text ("Select a size:");
+         ImGui.Widgets.Radio_Button ("Small",  Size_Int, 1);
+         ImGui.Widgets.Radio_Button ("Medium", Size_Int, 2);
+         ImGui.Widgets.Radio_Button ("Large",  Size_Int, 3);
 
-         --------------------------------
-         Widgets.Separator;
+         ImGui.Widgets.Separator;
 
-         Widgets.Checkbox ("Pineapple on pizza?", Toggle_Pineapple);
+         ImGui.Widgets.Checkbox ("Pineapple on pizza?", Toggle_Pineapple);
 
          if Toggle_Pineapple then
-            Widgets.Slider_Float ("Pineapple ratio", Ratio, 0.0, 1.0);
+            ImGui.Widgets.Slider_Float ("Pineapple ratio", Ratio, 0.0, 1.0);
          else
-            Widgets.New_Line;
+            ImGui.Widgets.New_Line;
          end if;
 
-         Widgets.Colour_Edit_RGB ("Crust colour", Colour3);
-         Widgets.Colour_Edit_RGBA ("Steam colour", Colour4);
+         ImGui.Widgets.Colour_Edit_RGB ("Crust colour", Colour3);
+         ImGui.Widgets.Colour_Edit_RGBA ("Steam colour", Colour4);
 
-         --------------------------------
-         Widgets.Separator;
+         ImGui.Widgets.Separator;
 
-         -- Ingredients tab bar
-         if Widgets.Begin_Tab_Bar ("Ingredients selection") then
+         if ImGui.Widgets.Begin_Tab_Bar ("Ingredients selection") then
 
-            if Widgets.Begin_Tab_Item ("Vegetables") then
-               Widgets.Text ("Onions");
-               Widgets.Text ("Tomatoes");
-               Widgets.Text ("Peppers");
-               Widgets.Text ("Jalapenos");
-               Widgets.Same_Line;
-               Widgets.Text ("(hot!)", (1.0, 0.5, 0.5, 1.0));
-               Widgets.Text ("Mushrooms");
+            if ImGui.Widgets.Begin_Tab_Item ("Vegetables") then
+               ImGui.Widgets.Text ("Onions");
+               ImGui.Widgets.Text ("Tomatoes");
+               ImGui.Widgets.Text ("Peppers");
+               ImGui.Widgets.Text ("Jalapenos");
+               ImGui.Widgets.Same_Line;
+               ImGui.Widgets.Text ("(hot!)", (1.0, 0.5, 0.5, 1.0));
+               ImGui.Widgets.Text ("Mushrooms");
 
-               Widgets.End_Tab_Item;
+               ImGui.Widgets.End_Tab_Item;
             end if;
 
-            if Eats_Meat and then Widgets.Begin_Tab_Item ("Meats", Eats_Meat) then
-               Widgets.Text ("Pork Salami");
-               Widgets.Text ("Beef Salami");
-               Widgets.Text ("Pulled Pork");
-               Widgets.Text ("Grilled Chicken");
+            if
+               Eats_Meat and then
+               ImGui.Widgets.Begin_Tab_Item ("Meats", Eats_Meat)
+            then
+               ImGui.Widgets.Text ("Pork Salami");
+               ImGui.Widgets.Text ("Beef Salami");
+               ImGui.Widgets.Text ("Pulled Pork");
+               ImGui.Widgets.Text ("Grilled Chicken");
 
-               Widgets.End_Tab_Item;
+               ImGui.Widgets.End_Tab_Item;
             end if;
 
-            if Widgets.Begin_Tab_Item ("Cheese") then
-               Widgets.Text ("Mozzarella");
-               Widgets.Text ("Emmental");
-               Widgets.Text ("Gouda");
-               Widgets.Text ("Cheddar");
-               Widgets.Text ("Gruyere");
+            if ImGui.Widgets.Begin_Tab_Item ("Cheese") then
+               ImGui.Widgets.Text ("Mozzarella");
+               ImGui.Widgets.Text ("Emmental");
+               ImGui.Widgets.Text ("Gouda");
+               ImGui.Widgets.Text ("Cheddar");
+               ImGui.Widgets.Text ("Gruyere");
 
-               Widgets.End_Tab_Item;
+               ImGui.Widgets.End_Tab_Item;
             end if;
 
-            Widgets.End_Tab_Bar;
+            ImGui.Widgets.End_Tab_Bar;
          end if;
 
+         ImGui.Windows.End_Window;
       end if;
 
-      Windows.End_Window;
+      ImGui.Drawing.Render;
 
-      -- Rendering
-      Drawing.Render;
+      Glfw.Windows.Get_Framebuffer_Size (
+         Window'Access, Window_Width, Window_Height);
 
-      Glfw.Windows.Get_Framebuffer_Size (Window'Access, Window_Width, Window_Height);
-      GL.Window.Set_Viewport (0, 0, GL.Types.Int (Window_Width), GL.Types.Int (Window_Height));
+      GL.Window.Set_Viewport (
+         X      => 0,
+         Y      => 0,
+         Width  => GL.Types.Int (Window_Width),
+         Height => GL.Types.Int (Window_Height));
 
       GL.Buffers.Set_Color_Clear_Value ((0.0, 0.0, 0.0, 1.0));
-      GL.Buffers.Clear ((true, false, false, true));
+      GL.Buffers.Clear ((True, False, False, True));
 
-      Backend_OpenGL3.Render_Draw_Data (Drawing.Get_Draw_Data);
+      ImGui.Backend_OpenGL3.Render_Draw_Data (ImGui.Drawing.Get_Draw_Data);
 
       Glfw.Windows.Context.Swap_Buffers (Window'Access);
-
    end loop;
 
    if Window.Visible then
-      Text_IO.Put_Line ("Closing Glfw window...");
+      Put_Line ("Closing Glfw window...");
       Window.Destroy;
    end if;
 
-   -- [ImGui] Finalisation
-   Backend_OpenGL3.Shutdown;
-   Backend_Glfw.Shutdown;
-   Contexts.Destroy (Current_Context);
+   ImGui.Backend_OpenGL3.Shutdown;
+   ImGui.Backend_Glfw.Shutdown;
+   ImGui.Contexts.Destroy (Current_Context);
 
-   -- [Glfw] Finalisation
    Glfw.Shutdown;
 
 end ImGui_Example;
