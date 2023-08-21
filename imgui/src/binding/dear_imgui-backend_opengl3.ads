@@ -7,13 +7,6 @@ pragma License (Modified_GPL);
 with Dear_ImGui.API;
 
 
-
-pragma Elaborate_All (Dear_ImGui.API);
-
-
-
-
-
 generic
 
 	with package P_API is new Dear_ImGui.API;

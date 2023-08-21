@@ -12,18 +12,6 @@ with GL.Window;
 
 with Generic_ImGui;
 
-pragma Elaborate_All (Ada.Text_IO);
-pragma Elaborate_All (Interfaces.C.Strings);
-
-pragma Elaborate_All (Glfw.Input);
-pragma Elaborate_All (Glfw.Windows.Context);
-pragma Elaborate_All (Glfw.Windows.Hints);
-pragma Elaborate_All (GL.Buffers);
-pragma Elaborate_All (GL.Types);
-pragma Elaborate_All (GL.Window);
-
-pragma Elaborate_All (Generic_ImGui);
-
 procedure ImGui_Example is
 
    -- Use clauses

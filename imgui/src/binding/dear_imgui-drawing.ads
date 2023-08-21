@@ -8,12 +8,6 @@ with Dear_ImGui.API;
 
 
 
-pragma Elaborate (Dear_ImGui.API);
-
-
-
-
-
 generic
 
 	with package P_API is new Dear_ImGui.API; -- Needed to return the draw data

@@ -11,17 +11,6 @@ with Glfw.Windows;
 with Glfw.Monitors;
 
 
-
-pragma Elaborate_All (Ada.Finalization);
-pragma Elaborate_All (System);
-
-pragma Elaborate_All (Glfw.Windows);
-pragma Elaborate_All (Glfw.Monitors);
-
-
-
-
-
 generic
 
 package Dear_ImGui.Backend_Glfw is

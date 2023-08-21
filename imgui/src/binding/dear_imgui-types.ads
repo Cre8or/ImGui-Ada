@@ -1,9 +1,6 @@
 pragma License (Modified_GPL);
 
 
-
-
-
 generic
 
 package Dear_ImGui.Types is

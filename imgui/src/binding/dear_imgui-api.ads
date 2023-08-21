@@ -6,10 +6,6 @@ with System;
 with Interfaces.C.Extensions;
 with Interfaces.C.Strings;
 
-
-
-
-
 generic
 
 package Dear_ImGui.API is
