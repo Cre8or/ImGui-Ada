@@ -2,9 +2,9 @@ name = "imgui_example"
 description = "Shiny new project"
 version = "0.1.0-dev"
 
-authors = ["Michael Hardeman"]
-maintainers = ["Michael Hardeman <michael.hardeman@protonmail.com>"]
-maintainers-logins = ["code-undisclosed"]
+authors = ["Cre8or"]
+maintainers = ["Cre8or <enter.you.email@crea8or.com>"]
+maintainers-logins = ["Cre8or"]
 
 executables = ["imgui_example"]
 [[depends-on]]
