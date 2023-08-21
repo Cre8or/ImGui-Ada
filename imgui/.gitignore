@@ -17,10 +17,10 @@
 *.dll
 *.exe
 
-alire
-
-obj/*
-lib/*
+/config/
+/alire/
+/obj/
+/lib/
 
 # Test project
 test_project/obj/*
