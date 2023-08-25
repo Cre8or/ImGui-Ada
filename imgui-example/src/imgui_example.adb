@@ -1,6 +1,6 @@
 pragma License (Restricted);
 
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;
 
 with Glfw.Input;
 with Glfw.Windows.Context;
@@ -28,7 +28,7 @@ procedure ImGui_Example is
    Window_Width : Glfw.Size := 640;
    Window_Height : Glfw.Size := 480;
 
-   Pizza_Window_Is_Open : aliased Boolean := True;
+   Is_Pizza_Window_Open : Boolean := True;
    Toggle_Pineapple : Boolean := False;
    Size_Int : Natural := 0; -- Valid options in range 1 .. 3;
    Colour3 : ImGui.Types.T_Colour_RGB  := (others => 0.0);
@@ -36,8 +36,7 @@ procedure ImGui_Example is
    Ratio : Float := 0.1;
    Eats_Meat : Boolean := True;
    Current_Context : ImGui.Contexts.T_ImGuiContext;
-   Theme_Is_Light : Boolean := False;
-   Toggle_Light_Theme : Boolean := False;
+   Is_Light_Theme : Boolean := False;
 begin
 
    Glfw.Init;
@@ -54,7 +53,7 @@ begin
    ImGui.Backend_OpenGL3.Init;
 
    while
-      not Window.Should_Close and then Pizza_Window_Is_Open
+      not Window.Should_Close and then Is_Pizza_Window_Open
    loop
 
       Glfw.Input.Wait_For_Events;
@@ -75,26 +74,11 @@ begin
          Condition => ImGui.Types.E_Once);
 
       if ImGui.Windows.Begin_Window (
-         "Pizza time!", PIZZA_WINDOW_FLAGS, Pizza_Window_Is_Open)
+         "Pizza time!", PIZZA_WINDOW_FLAGS, Is_Pizza_Window_Open)
       then
 
-         if not Pizza_Window_Is_Open then
-            Put_Line ("ImGui Window closing widget pressed");
-         end if;
-
-         -- Handle theme selection
-         if Theme_Is_Light then
-            -- We toggled off light theme
-            if not Toggle_Light_Theme then
-               ImGui.API.igStyleColorsDark;
-               Theme_Is_Light := False;
-            end if;
-         else
-            -- We toggled on light theme
-            if Toggle_Light_Theme then
-               ImGui.API.igStyleColorsLight;
-               Theme_Is_Light := True;
-            end if;
+         if not Is_Pizza_Window_Open then
+            Ada.Text_IO.Put_Line ("ImGui Window closing widget pressed");
          end if;
 
          if ImGui.Widgets.Begin_Menu_Bar then
@@ -110,24 +94,35 @@ begin
                end if;
 
                if ImGui.Widgets.Menu_Item ("Print ""Test""") then
-                  Put_Line ("Test");
+                  Ada.Text_IO.Put_Line ("Test");
                end if;
 
                ImGui.Widgets.Menu_Item_Toggle ("Pineapple?", Toggle_Pineapple);
 
                if ImGui.Widgets.Menu_Item ("Unavailable", False, False) then
-                  Put_Line ("How did you get here?!");
+                  Ada.Text_IO.Put_Line ("How did you get here?!");
                end if;
 
-               ImGui.Widgets.Menu_Item_Toggle (
-                  "Light Theme", Toggle_Light_Theme);
+               declare
+                  State_Changed : constant Boolean := ImGui.Widgets.
+                     Menu_Item_Toggle ("Light Theme", Is_Light_Theme);
+               begin
+                  if State_Changed then
+                     if Is_Light_Theme then
+                        ImGui.API.igStyleColorsLight;
+                     else
+                        ImGui.API.igStyleColorsDark;
+                     end if;
+                  end if;
+               end;
 
                ImGui.Widgets.Text ("This isn't an item");
 
                ImGui.Widgets.Separator;
                if ImGui.Widgets.Menu_Item ("Exit") then
-                  Put_Line ("TERMINATING: ""Exit"" menu item pressed");
-                  Pizza_Window_Is_Open := False;
+                  Ada.Text_IO.Put_Line (
+                     "TERMINATING: ""Exit"" menu item pressed");
+                  Is_Pizza_Window_Open := False;
                end if;
 
                ImGui.Widgets.End_Menu;
@@ -143,8 +138,8 @@ begin
          end if;
 
          if ImGui.Widgets.Button ("I don't like pizza.") then
-            Put_Line ("TERMINATING: Button pressed");
-            Pizza_Window_Is_Open := False;
+            Ada.Text_IO.Put_Line ("TERMINATING: Button pressed");
+            Is_Pizza_Window_Open := False;
          end if;
 
          ImGui.Widgets.Push_Item_Width (-ITEM_WIDTH);
@@ -210,8 +205,9 @@ begin
             ImGui.Widgets.End_Tab_Bar;
          end if;
 
-         ImGui.Windows.End_Window;
       end if;
+
+      ImGui.Windows.End_Window;
 
       ImGui.Drawing.Render;
 
@@ -233,7 +229,7 @@ begin
    end loop;
 
    if Window.Visible then
-      Put_Line ("Closing Glfw window...");
+      Ada.Text_IO.Put_Line ("Closing Glfw window...");
       Window.Destroy;
    end if;
 
