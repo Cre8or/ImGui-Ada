@@ -15,21 +15,6 @@ with Dear_ImGui.Widgets;
 with Dear_ImGui.Windows;
 
 
-
-pragma Elaborate_All (Dear_ImGui.API);
-pragma Elaborate_All (Dear_ImGui.Backend_Glfw);
-pragma Elaborate_All (Dear_ImGui.Backend_OpenGL3);
-pragma Elaborate_All (Dear_ImGui.Contexts);
-pragma Elaborate_All (Dear_ImGui.Drawing);
-pragma Elaborate_All (Dear_ImGui.Inputs);
-pragma Elaborate_All (Dear_ImGui.Types);
-pragma Elaborate_All (Dear_ImGui.Widgets);
-pragma Elaborate_All (Dear_ImGui.Windows);
-
-
-
-
-
 generic
 
 	type T_Float is digits <>;

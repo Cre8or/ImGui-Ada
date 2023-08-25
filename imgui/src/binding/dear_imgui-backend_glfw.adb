@@ -1,18 +1,5 @@
 pragma License (Modified_GPL);
-
-
-
-
-
 with Ada.Unchecked_Conversion;
-
-
-
-pragma Elaborate_All (Ada.Unchecked_Conversion);
-
-
-
-
 
 package body Dear_ImGui.Backend_Glfw is
 

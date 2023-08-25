@@ -7,13 +7,6 @@ pragma License (Modified_GPL);
 with Dear_ImGui.Types;
 
 
-
-pragma Elaborate (Dear_ImGui.Types);
-
-
-
-
-
 generic
 
 	with package P_Types is new Dear_ImGui.Types;

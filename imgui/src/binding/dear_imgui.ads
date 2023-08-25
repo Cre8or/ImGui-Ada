@@ -9,12 +9,6 @@ with Interfaces.C.Strings;
 
 
 
-pragma Elaborate_All (Interfaces.C.Extensions);
-pragma Elaborate_All (Interfaces.C.Strings);
-
-
-
-
 
 generic
 

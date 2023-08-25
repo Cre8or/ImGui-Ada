@@ -8,14 +8,6 @@ with Dear_ImGui.API;
 with Dear_ImGui.Types;
 
 
-
-pragma Elaborate_All (Dear_ImGui.API);
-pragma Elaborate_All (Dear_ImGui.Types);
-
-
-
-
-
 generic
 
 	with package P_API   is new Dear_ImGui.API;

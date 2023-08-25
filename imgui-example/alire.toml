@@ -1,0 +1,12 @@
+name = "imgui_example"
+description = "Shiny new project"
+version = "0.1.0-dev"
+
+authors = ["Cre8or"]
+maintainers = ["Cre8or <enter.you.email@crea8or.com>"]
+maintainers-logins = ["Cre8or"]
+
+executables = ["imgui_example"]
+[[depends-on]]
+imgui = "~0.1.0-dev"
+openglada_glfw = "~0.9.0"
